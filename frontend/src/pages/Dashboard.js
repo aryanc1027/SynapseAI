@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { pdfjs } from 'react-pdf';
+import { GlobalWorkerOptions } from 'pdfjs-dist';
 import Flashcard from '../components/Flashcards';
 import './Dashboard.css';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Set up PDF.js worker
+GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
 
 const Dashboard = () => {
   const [input, setInput] = useState('');
@@ -12,7 +14,6 @@ const Dashboard = () => {
   const [flashcards, setFlashcards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [numCards, setNumCards] = useState(5);
-  
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -23,16 +24,21 @@ const Dashboard = () => {
     return new Promise((resolve, reject) => {
       reader.onload = async (e) => {
         const typedarray = new Uint8Array(e.target.result);
-        const pdf = await pdfjs.getDocument(typedarray).promise;
-        let fullText = '';
-        for (let i = 1; i <= pdf.numPages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          fullText += textContent.items.map(item => item.str).join(' ') + ' ';
+        try {
+          const pdf = await pdfjs.getDocument(typedarray).promise;
+          let fullText = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            fullText += textContent.items.map(item => item.str).join(' ') + ' ';
+          }
+          resolve(fullText);
+        } catch (error) {
+          console.error('Error extracting text from PDF:', error);
+          reject('Failed to extract text from PDF');
         }
-        resolve(fullText);
       };
-      reader.onerror = reject;
+      reader.onerror = () => reject('Error reading the file');
       reader.readAsArrayBuffer(file);
     });
   };
@@ -40,30 +46,42 @@ const Dashboard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-  
-    let textToProcess = input;
-  
-    if (file) {
-      textToProcess = await extractTextFromPDF(file);
-    }
-  
-    try {
-      const response = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
-        model: 'llama3-8b-8192',
-        messages: [{ 
-          role: 'user', 
-          content: `Generate ${numCards} flashcards from the following text. Format each flashcard as "Front: [question]" followed by "Back: [answer]" on the next line. Do not include any other text or formatting.\n\n${textToProcess}` 
-        }]
-      }, {
-        headers: {
-          'Authorization': `Bearer ${process.env.REACT_APP_GROQ_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      });
-  
-      const generatedText = response.data.choices[0].message.content || '';
-      console.log('Generated Text:', generatedText);
 
+    let textToProcess = input;
+
+    if (file) {
+      try {
+        textToProcess = await extractTextFromPDF(file);
+      } catch (error) {
+        console.error(error);
+        setFlashcards([{
+          front: 'Error processing PDF',
+          back: 'Please try again with a different file',
+        }]);
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    try {
+      const response = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model: 'llama3-8b-8192',
+          messages: [{
+            role: 'user',
+            content: `Generate ${numCards} flashcards from the following text. Format each flashcard as "Front: [question]" followed by "Back: [answer]" on the next line. Do not include any other text or formatting.\n\n${textToProcess}`,
+          }],
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.REACT_APP_GROQ_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      const generatedText = response.data.choices[0]?.message?.content || '';
       const lines = generatedText.split('\n');
       const cards = [];
       let currentCard = {};
@@ -84,19 +102,15 @@ const Dashboard = () => {
         cards.push(currentCard);
       }
 
-      console.log('Parsed Cards:', cards);
       setFlashcards(cards);
     } catch (error) {
       console.error('Error calling Groq API:', error);
-      if (error.response) {
-        console.error('Error Response:', error.response.data);
-      }
       setFlashcards([{
         front: 'Error generating flashcards',
-        back: 'Please try again'
+        back: 'Please try again',
       }]);
     }
-  
+
     setIsLoading(false);
   };
 
@@ -106,11 +120,9 @@ const Dashboard = () => {
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Study Progress</h2>
-          {/* Add progress visualization here */}
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Recent Quizzes</h2>
-          {/* Add recent quizzes list here */}
         </div>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -122,7 +134,7 @@ const Dashboard = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter text to generate flashcards..."
-          ></textarea>
+          />
           <div className="mb-2">
             <label className="block text-sm font-medium text-gray-700">Or upload a PDF file</label>
             <input type="file" accept=".pdf" onChange={handleFileChange} className="mt-1" />
