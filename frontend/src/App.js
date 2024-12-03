@@ -4,6 +4,7 @@ import { UserProvider } from './contexts/UserContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import FlashcardsPage from './pages/Flashcard';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
           <Route 
             path="/dashboard" 
             element={<Dashboard />} />
+          <Route path="/flashcards" element={<FlashcardsPage />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
