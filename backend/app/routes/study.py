@@ -4,7 +4,7 @@ from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime, timedelta
 from ..database import get_db
-from ..models.study_set import StudySet
+from ..models.study_set import Flashcard, StudySet
 from ..models.study_history import StudyHistory
 from ..models.user import User
 from pydantic import BaseModel
@@ -198,6 +198,22 @@ def create_study_set(
 ):
     """Create a study set for a user"""
     new_study_set = StudySet(**study_set_data.dict(), user_id=user_id)
+    db.add(new_study_set)
+    db.commit()
+    db.refresh(new_study_set)
+    return new_study_set
+
+@router.post("/study_sets", response_model=StudySetResponse)
+def create_study_set(study_set_data: StudySetCreate, db: Session = Depends(get_db)):
+    """Create a study set with associated flashcards"""
+    new_study_set = StudySet(
+        title=study_set_data.title,
+        description=study_set_data.description,
+        user_id=study_set_data.user_id
+    )
+
+    new_study_set.flashcards = [Flashcard(**flashcard.dict()) for flashcard in study_set_data.flashcards]
+
     db.add(new_study_set)
     db.commit()
     db.refresh(new_study_set)
