@@ -10,7 +10,7 @@ from ..models.user import User
 from pydantic import BaseModel
 
 router = APIRouter(
-    prefix="/api",
+    prefix="/api/study",
     tags=["study"]
 )
 
@@ -175,3 +175,30 @@ def create_study_set(study_set: StudySetCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_set)
     return new_set
+
+@router.get("/study-sets/{user_id}", response_model=List[StudySetResponse])
+def get_study_sets(user_id: int, db: Session = Depends(get_db)):
+    study_sets = db.query(StudySet).filter(StudySet.user_id == user_id).all()
+    return study_sets
+
+@router.get("/study-history/{user_id}", response_model=List[StudyHistoryStats])
+def get_study_history(user_id: int, db: Session = Depends(get_db)):
+    study_histories = (
+        db.query(StudyHistory)
+        .filter(StudyHistory.user_id == user_id)
+        .all()
+    )
+    return study_histories
+
+@router.post("/users/{user_id}/study_sets", response_model=StudySetResponse)
+def create_study_set(
+    user_id: int,
+    study_set_data: StudySetCreate,
+    db: Session = Depends(get_db),
+):
+    """Create a study set for a user"""
+    new_study_set = StudySet(**study_set_data.dict(), user_id=user_id)
+    db.add(new_study_set)
+    db.commit()
+    db.refresh(new_study_set)
+    return new_study_set
