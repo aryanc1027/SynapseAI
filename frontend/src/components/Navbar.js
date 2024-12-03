@@ -15,12 +15,6 @@ const NavBar = () => {
           <Link to="/flashcards" className="text-white hover:text-purple-200 transition duration-150 ease-in-out">
             Flashcards
           </Link>
-          <Link to="/quizzes" className="text-white hover:text-purple-200 transition duration-150 ease-in-out">
-            Quizzes
-          </Link>
-          <Link to="/study-session" className="text-white hover:text-purple-200 transition duration-150 ease-in-out">
-            Study Session
-          </Link>
           <Link to="/login" className="bg-white text-purple-600 px-4 py-2 rounded-full hover:bg-purple-100 transition duration-150 ease-in-out">
             Login
           </Link>
