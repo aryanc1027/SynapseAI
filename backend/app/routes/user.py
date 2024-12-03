@@ -1,32 +1,31 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ...database import db_session
-from ..models.user import User
-from ..utils import hash_password, verify_password
-from pydantic import BaseModel
+from backend.app.database import get_db
+from backend.app.models.user import User
+from backend.app.schemas.user import UserCreate
+from backend.app.utils.auth import get_password_hash
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/users",
+    tags=["users"]
+)
 
-class UserCreate(BaseModel):
-    username: str
-    password: str
-
-@router.post("/register")
-def register_user(user: UserCreate, db: Session = Depends(db_session)):
-    hashed_pw = hash_password(user.password)
-    new_user = User(username=user.username, hashed_password=hashed_pw)
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return {"message": "User created successfully"}
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-@router.post("/login")
-def login_user(user: UserLogin, db: Session = Depends(db_session)):
+@router.post("")
+def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    # Check if user exists
     db_user = db.query(User).filter(User.username == user.username).first()
-    if not db_user or not verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(status_code=400, detail="Invalid credentials")
-    return {"message": "Login successful", "user_id": db_user.id}
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    
+    # Create new user
+    hashed_pw = get_password_hash(user.password)
+    new_user = User(username=user.username, hashed_password=hashed_pw)
+    
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return {"id": new_user.id, "username": new_user.username}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
