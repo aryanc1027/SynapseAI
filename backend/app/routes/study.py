@@ -8,7 +8,7 @@ from ..models.study_set import Flashcard, StudySet
 from ..models.study_history import StudyHistory
 from ..models.user import User
 from pydantic import BaseModel
-from ..schemas.study_set import FlashcardCreate
+from ..schemas.study_set import FlashcardCreate, FlashcardResponse
 
 router = APIRouter(
     prefix="/api/study",
@@ -28,7 +28,7 @@ class StudySetCreate(BaseModel):
     description: str
     user_id: int
     flashcards: List[FlashcardCreate] # Include flashcards when creating a study set
- 
+    progress: int = 0  # Default progress value
 
 
 class StudySetUpdate(StudySetBase):
@@ -38,10 +38,12 @@ class StudySetResponse(StudySetBase):
     id: int
     user_id: int
     created_at: datetime
+    flashcards: List[FlashcardResponse]
+    progress: int  # Include progress in the response
 
     class Config:
         from_attributes = True
-
+        
 class StudyHistoryStats(BaseModel):
     total_sessions: int
     average_score: float
@@ -205,8 +207,8 @@ def create_study_set(
     new_study_set = StudySet(
         title=study_set_data.title,
         description=study_set_data.description,
-        user_id=user_id
-
+        user_id=user_id,
+        progress=study_set_data.progress  # Set the progress value
     )
     print(study_set_data)
     new_study_set.flashcards = [

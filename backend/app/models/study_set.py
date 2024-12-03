@@ -11,6 +11,7 @@ class StudySet(Base):
     description = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    progress = Column(Integer, default=0)
 
     user = relationship("User", back_populates="study_sets")
     study_histories = relationship("StudyHistory", back_populates="study_set")

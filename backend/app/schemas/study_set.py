@@ -25,7 +25,8 @@ class StudySetCreate(BaseModel):
     title: str
     description: str
     user_id: int
-    flashcards: List[FlashcardCreate] # Include flashcards when creating a study set
+    flashcards: List[FlashcardCreate]  # Include flashcards when creating a study set
+    progress: int = 0  # Default progress value
 
 class StudySetResponse(StudySetBase):
     id: int
