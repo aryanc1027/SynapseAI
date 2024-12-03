@@ -3,7 +3,7 @@ import axios from 'axios';
 import { API_BASE_URL } from '../services';
 import { pdfjs } from 'react-pdf';
 import { GlobalWorkerOptions } from 'pdfjs-dist';
-import Flashcard from '../components/Flashcards';
+import Flashcard from '../components/FlashCards';
 import './Dashboard.css';
 
 GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
@@ -120,6 +120,7 @@ const Dashboard = () => {
         description: description, 
         flashcards: flashcards.map(({ front, back }) => ({ front, back })),
         user_id: id,
+        progress: 0
       };
   
       const dbResponse = await axios.post(
@@ -254,6 +255,7 @@ const Dashboard = () => {
                 >
                   <h3 className="font-medium text-lg">{set.title}</h3>
                   <p className="text-gray-600">{set.description}</p>
+                  <p className="text-gray-600">Progress: {set.progress}%</p>
                 </div>
               ))}
             </div>
