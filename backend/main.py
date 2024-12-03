@@ -1,10 +1,12 @@
 from fastapi import FastAPI
-from .database import engine, Base
-from .app.routes import user, study
+from backend.app.database import engine, Base
+from backend.app.routes import user, study, auth
+
+Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-app.include_router(user.router, prefix="/users")
-app.include_router(study.router, prefix="/study")
-
-Base.metadata.create_all(bind=engine)
+app.include_router(user.router)
+app.include_router(study.router)
+app.include_router(auth.router)
