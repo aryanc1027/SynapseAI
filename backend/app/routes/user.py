@@ -6,7 +6,7 @@ from backend.app.schemas.user import UserCreate
 from backend.app.utils.auth import get_password_hash
 
 router = APIRouter(
-    prefix="/users",
+    prefix="/api/users",
     tags=["users"]
 )
 
@@ -29,3 +29,4 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+

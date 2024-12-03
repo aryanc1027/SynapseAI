@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
@@ -8,9 +8,12 @@ from ..models.user import User
 from ..utils.auth import verify_password, create_access_token
 import os
 from sqlalchemy.orm import Session
+from backend.app.schemas.user import UserCreate
+from backend.app.utils.auth import get_password_hash
+from passlib.context import CryptContext
 
 router = APIRouter(
-    prefix="/auth",
+    prefix="/api/auth",
     tags=["authentication"]
 )
 
@@ -45,27 +48,52 @@ async def get_current_user(
         raise credentials_exception
     return user
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+@router.post("/token")
 @router.post("/token")
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    email: str = Form(...),  # Changed from 'username' to 'email'
+    password: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    """Login endpoint that returns JWT token"""
-    user = db.query(User).filter(User.username == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
-    access_token = create_access_token(
-        data={"sub": user.username},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+
+    if not pwd_context.verify(password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Incorrect email or password")
+
+    # Generate a real JWT token
+    access_token = create_access_token(data={"sub": user.username})  # Use user's unique identifier
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @router.get("/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
     """Get current user's information"""
-    return current_user
+    return {
+        "id": current_user.id,
+        "username": current_user.username,
+        "email": current_user.email,
+    }
+
+
+@router.post("/register")
+async def register_user(user: UserCreate, db: Session = Depends(get_db)):
+    # Check if email or username already exists
+    existing_user = db.query(User).filter(
+        (User.username == user.username) | (User.email == user.email)
+    ).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username or email already taken")
+    
+    # Create new user
+    new_user = User(
+        username=user.username,
+        email=user.email,
+        hashed_password=get_password_hash(user.password)
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return {"message": "User registered successfully"}

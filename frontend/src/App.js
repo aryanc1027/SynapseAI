@@ -1,24 +1,24 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import HomePage from './pages/HomePage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { UserProvider } from './contexts/UserContext';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 
-function App() {
+const App = () => {
   return (
-    <Router>
-      <div className="App">
-        <Navbar />
+    <UserProvider>
+      <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/register" element={<Register />} />
+          <Route 
+            path="/dashboard" 
+            element={<Dashboard />} />
         </Routes>
-      </div>
-    </Router>
+      </BrowserRouter>
+    </UserProvider>
   );
-  
 }
 
 export default App;

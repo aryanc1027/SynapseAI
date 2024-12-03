@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../services/index';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -10,26 +12,42 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     // Basic form validation
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
     }
-
-    // Here you would typically make an API call to your backend for authentication
-    // Simulate
+  
     try {
-      // Simulated API call
-      // const response = await loginUser(email, password);
-      console.log('Login attempted with:', email, password);
-      
-      // If login is successful, redirect to dashboard
+      const response = await fetch(`${API_BASE_URL}/auth/token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          email: email,  // Changed 'username' to 'email'
+          password: password,
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`Error ${response.status}: ${errorData.detail || 'Invalid email or password'}`);
+      }
+  
+      const data = await response.json();
+      const { access_token } = data;
+  
+      // Save token to localStorage
+      localStorage.setItem('authToken', access_token);
+  
+      // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
-      setError('Invalid email or password');
+      setError(err.message || 'Something went wrong. Please try again.');
     }
-  };
+  };  
 
   return (
     <div className="bg-gradient-to-b from-indigo-50 to-purple-100 min-h-screen flex items-center justify-center">

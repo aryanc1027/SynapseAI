@@ -1,10 +1,10 @@
-from pydantic import BaseModel
-from datetime import datetime
+from pydantic import BaseModel, EmailStr  # Use EmailStr for validation
 from typing import List, Optional
 
 # Base User schema with common attributes
 class UserBase(BaseModel):
     username: str
+    email: EmailStr  # Add email field with validation
 
 # Schema for creating a user
 class UserCreate(UserBase):
