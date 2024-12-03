@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from .database import engine, Base
-from .app.routes import user, study
+from backend.app.routes import user, study
 
 app = FastAPI()
 
