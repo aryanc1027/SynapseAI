@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [flashcards, setFlashcards] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [numCards, setNumCards] = useState(5);
+  const [userId, setUserId] = useState(null);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -37,6 +38,56 @@ const Dashboard = () => {
       reader.readAsArrayBuffer(file);
     });
   };
+
+  const fetchUserId = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      console.error('User is not authenticated');
+      return;
+    }
+  
+    try {
+      const response = await axios.get(`${API_BASE_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setUserId(response.data.id);
+    } catch (error) {
+      console.error('Error fetching user ID:', error);
+    }
+  };  
+
+  const fetchStudySets = async (id) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_sets`);
+      console.log('Study Sets:', response.data);
+    } catch (error) {
+      console.error('Error fetching study sets:', error);
+    }
+  };
+
+  const fetchStudyHistory = async (id, timePeriod = 'all') => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_history`, {
+        params: { time_period: timePeriod },
+      });
+      console.log('Study History:', response.data);
+    } catch (error) {
+      console.error('Error fetching study history:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserId();
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchStudySets(userId);
+      fetchStudyHistory(userId);
+    }
+  }, [userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -105,35 +156,6 @@ const Dashboard = () => {
 
     setIsLoading(false);
   };
-
-  const fetchStudySets = async (userId) => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/study/users/${userId}/study_sets`
-      );
-      console.log('Study Sets:', response.data);
-    } catch (error) {
-      console.error('Error fetching study sets:', error);
-    }
-  };
-
-  const fetchStudyHistory = async (userId, timePeriod = 'all') => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/study/users/${userId}/study_history`,
-        { params: { time_period: timePeriod } }
-      );
-      console.log('Study History:', response.data);
-    } catch (error) {
-      console.error('Error fetching study history:', error);
-    }
-  };
-
-  useEffect(() => {
-    const userId = 1; // Replace with actual user ID
-    fetchStudySets(userId);
-    fetchStudyHistory(userId);
-  }, []);
 
   return (
     <div className="bg-indigo-50 min-h-screen p-8">

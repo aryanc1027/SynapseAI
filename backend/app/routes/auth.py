@@ -50,7 +50,6 @@ async def get_current_user(
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @router.post("/token")
-@router.post("/token")
 async def login(
     email: str = Form(...),  # Changed from 'username' to 'email'
     password: str = Form(...),
