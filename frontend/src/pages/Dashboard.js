@@ -15,6 +15,9 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [numCards, setNumCards] = useState(5);
   const [userId, setUserId] = useState(null);
+  const [studySets, setStudySets] = useState([]);
+
+  const cards = [];
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -61,7 +64,7 @@ const Dashboard = () => {
   const fetchStudySets = async (id) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_sets`);
-      console.log('Study Sets:', response.data);
+      setStudySets(response.data);
     } catch (error) {
       console.error('Error fetching study sets:', error);
     }
@@ -78,6 +81,75 @@ const Dashboard = () => {
     }
   };
 
+  
+
+  const acceptFlashCards = async (id, flashcards) => {
+    try {
+      const response = await axios.post(
+        'https://api.groq.com/openai/v1/chat/completions',
+        {
+          model: 'llama3-8b-8192',
+          messages: [
+            {
+              role: 'user',
+              content: `Generate a title and a brief description for these flashcards. Format it as "Title: [title]" on one line, followed by "Description: [description]" on the next line. Do not include any other text or formatting.\n\n${flashcards.map(({ front, back }) => `Front: ${front}\nBack: ${back}`).join('\n')}`,
+            },
+          ],
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_GROQ_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      const responseContent = response.data.choices[0].message.content;
+      const [titleLine, descriptionLine] = responseContent.split('\n');
+      
+      const title = titleLine.replace('Title: ', '').trim();
+      const description = descriptionLine.replace('Description: ', '').trim();
+      
+      // console.log('Title:', title);
+      // console.log('Description:', description);
+      
+          
+  
+      const studySetData = {
+        title: title, 
+        description: description, 
+        flashcards: flashcards.map(({ front, back }) => ({ front, back })),
+        user_id: id,
+      };
+  
+      const dbResponse = await axios.post(
+        `${API_BASE_URL}/study/users/${id}/study_sets`,
+        studySetData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`, // Ensure authToken is present in localStorage
+          },
+          withCredentials: true,
+        }
+      );
+      console.log('Flashcards saved to database:', dbResponse.data);
+    } catch (error) {
+      console.error('Error:', error);
+      setFlashcards([
+        { front: 'Error generating flashcards', back: 'Please try again.' },
+      ]);
+    }
+  };
+  const handleAddToDb = async () => {
+    if (userId && flashcards.length > 0) {
+      setIsLoading(true);
+      console.log('Adding flashcards to database', flashcards);
+      await acceptFlashCards(userId, flashcards);
+      setIsLoading(false);
+    } else {
+      console.error('User ID not available or no flashcards to add');
+    }
+  };
   useEffect(() => {
     fetchUserId();
   }, []);
@@ -86,15 +158,16 @@ const Dashboard = () => {
     if (userId) {
       fetchStudySets(userId);
       fetchStudyHistory(userId);
+
     }
   }, [userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     let textToProcess = input;
-
+  
     if (file) {
       try {
         textToProcess = await extractTextFromPDF(file);
@@ -104,7 +177,7 @@ const Dashboard = () => {
         return;
       }
     }
-
+  
     try {
       const response = await axios.post(
         'https://api.groq.com/openai/v1/chat/completions',
@@ -124,38 +197,43 @@ const Dashboard = () => {
           },
         }
       );
-
+  
+      //console.log('Groq API Response:', response.data.choices[0].message.content);
+  
+      // Parse response to extract flashcards
       const generatedText = response.data.choices[0].message.content || '';
       const lines = generatedText.split('\n');
-      const cards = [];
-      let currentCard = {};
-
+      let currentCard = { front: '', back: '' };
+  
       for (const line of lines) {
         if (line.startsWith('Front:')) {
-          if (currentCard.front) {
-            cards.push(currentCard);
-            currentCard = {};
+          if (currentCard.front && currentCard.back) {
+            // Push the completed card before starting a new one
+            cards.push({ ...currentCard });
+            currentCard = { front: '', back: '' };
           }
           currentCard.front = line.substring(6).trim();
         } else if (line.startsWith('Back:')) {
           currentCard.back = line.substring(5).trim();
         }
       }
-
+  
+      // Add the last card if complete
       if (currentCard.front && currentCard.back) {
-        cards.push(currentCard);
+        cards.push({ ...currentCard });
       }
-
-      setFlashcards(cards);
+      console.log('Generated Flashcards:', cards);
+      setFlashcards(cards); // Populate the state with flashcards
     } catch (error) {
       console.error('Error calling Groq API:', error);
       setFlashcards([
         { front: 'Error generating flashcards', back: 'Please try again.' },
       ]);
     }
-
+  
     setIsLoading(false);
   };
+  
 
   return (
     <div className="bg-indigo-50 min-h-screen p-8">
@@ -166,9 +244,20 @@ const Dashboard = () => {
           {/* Add progress visualization here */}
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Recent Quizzes</h2>
-          {/* Add recent quizzes list here */}
-        </div>
+            <h2 className="text-xl font-semibold mb-4">Recent Study Sets</h2>
+            <div className="max-h-60 overflow-y-auto">
+              {studySets.map((set, index) => (
+                <div 
+                  key={index} 
+                  className="mb-4 p-4 border rounded-lg shadow cursor-pointer hover:bg-gray-100"
+                  //onClick={() => handleStudySetClick(set.id)}
+                >
+                  <h3 className="font-medium text-lg">{set.title}</h3>
+                  <p className="text-gray-600">{set.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
       </div>
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold mb-4">Flashcard Generator</h2>
@@ -212,6 +301,14 @@ const Dashboard = () => {
             disabled={isLoading}
           >
             {isLoading ? 'Processing...' : 'Generate Flashcards'}
+          </button>
+          <button
+            type="button"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={handleAddToDb}
+            disabled={isLoading || flashcards.length === 0}
+          >
+            {isLoading ? 'Processing...' : 'Add to Database'}
           </button>
         </form>
         {flashcards.length > 0 && (

@@ -6,8 +6,6 @@ class FlashcardBase(BaseModel):
     front: str
     back: str
 
-class FlashcardCreate(FlashcardBase):
-    pass
 
 class FlashcardResponse(FlashcardBase):
     id: int
@@ -19,9 +17,15 @@ class StudySetBase(BaseModel):
     title: str
     description: str
 
-class StudySetCreate(StudySetBase):
+class FlashcardCreate(BaseModel):
+    front: str
+    back: str
+
+class StudySetCreate(BaseModel):
+    title: str
+    description: str
     user_id: int
-    flashcards: List[FlashcardCreate]  # Include flashcards when creating a study set
+    flashcards: List[FlashcardCreate] # Include flashcards when creating a study set
 
 class StudySetResponse(StudySetBase):
     id: int

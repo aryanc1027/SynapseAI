@@ -8,6 +8,7 @@ from ..models.study_set import Flashcard, StudySet
 from ..models.study_history import StudyHistory
 from ..models.user import User
 from pydantic import BaseModel
+from ..schemas.study_set import FlashcardCreate
 
 router = APIRouter(
     prefix="/api/study",
@@ -18,8 +19,17 @@ class StudySetBase(BaseModel):
     title: str
     description: str
 
-class StudySetCreate(StudySetBase):
+class FlashcardCreate(BaseModel):
+    front: str
+    back: str
+
+class StudySetCreate(BaseModel):
+    title: str
+    description: str
     user_id: int
+    flashcards: List[FlashcardCreate] # Include flashcards when creating a study set
+ 
+
 
 class StudySetUpdate(StudySetBase):
     pass
@@ -163,11 +173,6 @@ def log_study_history(history: StudyHistoryCreate, db: Session = Depends(get_db)
     db.refresh(new_history)
     return new_history
 
-class StudySetCreate(BaseModel):
-    title: str
-    description: str
-    user_id: int
-
 @router.post("/study_sets")
 def create_study_set(study_set: StudySetCreate, db: Session = Depends(get_db)):
     new_set = StudySet(**study_set.dict())
@@ -196,34 +201,22 @@ def create_study_set(
     study_set_data: StudySetCreate,
     db: Session = Depends(get_db),
 ):
-    """Create a study set for a user"""
-    new_study_set = StudySet(**study_set_data.dict(), user_id=user_id)
-    db.add(new_study_set)
-    db.commit()
-    db.refresh(new_study_set)
-    return new_study_set
-
-@router.post("/users/{user_id}/study_sets", response_model=StudySetResponse)
-def create_study_set(
-    user_id: int,
-    study_set_data: StudySetCreate,
-    db: Session = Depends(get_db),
-):
     """Create a study set with associated flashcards for a specific user."""
-    # Ensure the study set is tied to the specified user
     new_study_set = StudySet(
         title=study_set_data.title,
         description=study_set_data.description,
         user_id=user_id
-    )
 
-    # Add flashcards to the study set
+    )
+    print(study_set_data)
     new_study_set.flashcards = [
         Flashcard(front=flashcard.front, back=flashcard.back)
-        for flashcard in study_set_data.flashcards
+       
+        for flashcard in study_set_data.flashcards   # error here
     ]
+   
 
-    # Save to database
+
     db.add(new_study_set)
     db.commit()
     db.refresh(new_study_set)

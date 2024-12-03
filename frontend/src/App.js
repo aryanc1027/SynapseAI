@@ -4,7 +4,7 @@ import { UserProvider } from './contexts/UserContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import FlashcardsPage from './pages/Flashcard';
+import Study from './pages/Study';
 import Home from './pages/HomePage'; 
 import Navbar from './components/Navbar'; 
 
@@ -20,7 +20,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/flashcards" element={<FlashcardsPage />} />
+          <Route path="/study" element={<Study />} />
         </Routes>
       </BrowserRouter>
     </UserProvider>
