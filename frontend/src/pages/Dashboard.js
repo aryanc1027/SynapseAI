@@ -7,10 +7,11 @@ const Dashboard = () => {
  const [output, setOutput] = useState('');
  const [isLoading, setIsLoading] = useState(false);
  const [isFlipped, setIsFlipped] = useState(true);
- const [cardText, setCardText] = useState({
-   front: 'This is the front of the flashcard',
-   back: 'This is the back of the flashcard'
- });
+ // eslint-disable-next-line no-unused-vars
+const [cardText, setCardText] = useState({
+  front: 'This is the front of the flashcard',
+  back: 'This is the back of the flashcard'
+});
 
 
  const handleSubmit = async (e) => {

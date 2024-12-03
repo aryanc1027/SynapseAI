@@ -16,18 +16,22 @@ These instructions will get you a copy of the project up and running on your loc
 ### Installation
 
 1. Clone the repository
-2. Set up backend
+2. Set up and start backend
     ```bash 
     cd backend
     pip install -r requirements.txt
     cd ..
+    uvicorn backend.main:app --reload
     ```
-3. Set up frontend
+3. Create User 
+    ```
+
+4. Set up frontend
     ```bash 
     cd frontend
     npm install
     ```
-4. Run frontend
+5. Run frontend
     ```bash 
     npm start
     ```
