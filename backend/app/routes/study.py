@@ -203,18 +203,29 @@ def create_study_set(
     db.refresh(new_study_set)
     return new_study_set
 
-@router.post("/study_sets", response_model=StudySetResponse)
-def create_study_set(study_set_data: StudySetCreate, db: Session = Depends(get_db)):
-    """Create a study set with associated flashcards"""
+@router.post("/users/{user_id}/study_sets", response_model=StudySetResponse)
+def create_study_set(
+    user_id: int,
+    study_set_data: StudySetCreate,
+    db: Session = Depends(get_db),
+):
+    """Create a study set with associated flashcards for a specific user."""
+    # Ensure the study set is tied to the specified user
     new_study_set = StudySet(
         title=study_set_data.title,
         description=study_set_data.description,
-        user_id=study_set_data.user_id
+        user_id=user_id
     )
 
-    new_study_set.flashcards = [Flashcard(**flashcard.dict()) for flashcard in study_set_data.flashcards]
+    # Add flashcards to the study set
+    new_study_set.flashcards = [
+        Flashcard(front=flashcard.front, back=flashcard.back)
+        for flashcard in study_set_data.flashcards
+    ]
 
+    # Save to database
     db.add(new_study_set)
     db.commit()
     db.refresh(new_study_set)
+
     return new_study_set
