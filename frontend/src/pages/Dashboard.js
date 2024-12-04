@@ -6,6 +6,8 @@ import { GlobalWorkerOptions } from 'pdfjs-dist';
 import Flashcard from '../components/Flashcards';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import ProgressCircle from '../components/ProgressCircle';
+
 
 
 
@@ -249,7 +251,14 @@ const Dashboard = () => {
       <div className="grid md:grid-cols-2 gap-6 mb-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4">Study Progress</h2>
-          {/* Add progress visualization here */}
+          {studySets.length > 0 ? (
+            <ProgressCircle
+              progress={studySets[0].progress}
+              title={studySets[0].title}
+            />
+          ) : (
+            <p>No study sets available</p>
+          )}
         </div>
         <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Recent Study Sets</h2>
