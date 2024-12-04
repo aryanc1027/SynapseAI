@@ -3,8 +3,11 @@ import axios from 'axios';
 import { API_BASE_URL } from '../services';
 import { pdfjs } from 'react-pdf';
 import { GlobalWorkerOptions } from 'pdfjs-dist';
-import Flashcard from '../components/FlashCards';
+import Flashcard from '../components/Flashcards';
 import './Dashboard.css';
+import { useNavigate } from 'react-router-dom';
+
+
 
 GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
 
@@ -16,6 +19,8 @@ const Dashboard = () => {
   const [numCards, setNumCards] = useState(5);
   const [userId, setUserId] = useState(null);
   const [studySets, setStudySets] = useState([]);
+  const navigate = useNavigate();
+
 
   const cards = [];
 
@@ -65,21 +70,22 @@ const Dashboard = () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_sets`);
       setStudySets(response.data);
+      console.log('Study Sets:', response);
     } catch (error) {
       console.error('Error fetching study sets:', error);
     }
   };
 
-  const fetchStudyHistory = async (id, timePeriod = 'all') => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_history`, {
-        params: { time_period: timePeriod },
-      });
-      console.log('Study History:', response.data);
-    } catch (error) {
-      console.error('Error fetching study history:', error);
-    }
-  };
+  // const fetchStudyHistory = async (id, timePeriod = 'all') => {
+  //   try {
+  //     const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_history`, {
+  //       params: { time_period: timePeriod },
+  //     });
+  //     //console.log('Study History:', response);
+  //   } catch (error) {
+  //     console.error('Error fetching study history:', error);
+  //   }
+  // };
 
   
 
@@ -147,6 +153,7 @@ const Dashboard = () => {
       console.log('Adding flashcards to database', flashcards);
       await acceptFlashCards(userId, flashcards);
       setIsLoading(false);
+      fetchStudySets(userId);
     } else {
       console.error('User ID not available or no flashcards to add');
     }
@@ -158,7 +165,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (userId) {
       fetchStudySets(userId);
-      fetchStudyHistory(userId);
+      //fetchStudyHistory(userId);
 
     }
   }, [userId]);
@@ -247,17 +254,20 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4">Recent Study Sets</h2>
             <div className="max-h-60 overflow-y-auto">
-              {studySets.map((set, index) => (
+            {studySets
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+              .map((set) => (
                 <div 
-                  key={index} 
+                  key={set.id}
                   className="mb-4 p-4 border rounded-lg shadow cursor-pointer hover:bg-gray-100"
-                  //onClick={() => handleStudySetClick(set.id)}
+                  onClick={() => navigate(`/study/${set.id}`)}
                 >
                   <h3 className="font-medium text-lg">{set.title}</h3>
                   <p className="text-gray-600">{set.description}</p>
-                  <p className="text-gray-600">Progress: {set.progress}%</p>
+                  <p className="text-gray-600">{set.progress}%</p>
                 </div>
-              ))}
+              ))
+            }
             </div>
           </div>
       </div>
