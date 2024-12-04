@@ -197,6 +197,26 @@ def get_study_history(user_id: int, db: Session = Depends(get_db)):
     )
     return study_histories
 
+class ProgressUpdate(BaseModel):
+    progress: int
+
+@router.put("/progress/{study_set_id}")
+def update_study_set_progress(
+    study_set_id: int,
+    progress_update: ProgressUpdate,
+    db: Session = Depends(get_db)
+):
+    study_set = db.query(StudySet).filter(StudySet.id == study_set_id).first()
+
+    if not study_set:
+        raise HTTPException(status_code=404, detail="Study set not found")
+
+    study_set.progress = progress_update.progress
+    db.commit()
+    db.refresh(study_set)  
+
+    return {"message": "Progress updated successfully", "study_set": study_set}
+
 @router.post("/users/{user_id}/study_sets", response_model=StudySetResponse)
 def create_study_set(
     user_id: int,
