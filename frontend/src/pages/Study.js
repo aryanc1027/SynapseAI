@@ -30,7 +30,6 @@ useEffect(() => {
       setStudySet(response.data);
       setIsLoading(false);
       
-      // Check if the study set is completed
       if (response.data.progress === 100) {
         setIsCompleted(true);
         setCompletedCards(response.data.flashcards.map((_, index) => index));
@@ -44,33 +43,6 @@ useEffect(() => {
   fetchStudySet();
 }, [id]);
 
-// const updateProgress = useCallback(async () => {
-//   try {
-//     const progress = calculate_progress(completedCards, studySet.flashcards.length);
-
-//     await axios.put(
-//       `${API_BASE_URL}/study/progress/${id}`,
-//       { progress }, 
-//       {
-//         headers: {
-//           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-//         },
-//       }
-//     );
-
-//     setStudySet(prevStudySet => ({
-//       ...prevStudySet,
-//       progress: progress
-//     }));
-
-//     console.log('Progress updated successfully');
-//   } catch (error) {
-//     console.error('Error updating progress:', error);
-//     if (error.response) {
-//       console.error('Backend response:', error.response.data);
-//     }
-//   }
-// }, [id, completedCards, studySet]);
 
 const calculate_progress = (completed_cards, total_cards) => {
   if (total_cards === 0) {
@@ -120,12 +92,10 @@ const calculate_progress = (completed_cards, total_cards) => {
           !newCompletedCards.includes(index) && index !== currentCardIndex
         );
       } else if (!correct) {
-        // If no new cards and current card was incorrect, go back to the first incorrect card
         nextIndex = studySet.flashcards.findIndex((_, index) => 
           !newCompletedCards.includes(index)
         );
       } else {
-        // All cards completed
         setIsCompleted(true);
       }
   

@@ -7,7 +7,6 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check for existing token and fetch user data on mount
   useEffect(() => {
     const initializeAuth = async () => {
       const token = localStorage.getItem('token');

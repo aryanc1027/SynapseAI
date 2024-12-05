@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
     setError('');
   
-    // Basic form validation
+  
     if (!email || !password) {
       setError('Please fill in all fields');
       return;
@@ -26,7 +26,7 @@ const Login = () => {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
-          email: email,  // Changed 'username' to 'email'
+          email: email,  
           password: password,
         }),
       });
@@ -39,10 +39,9 @@ const Login = () => {
       const data = await response.json();
       const { access_token } = data;
   
-      // Save token to localStorage
+     
       localStorage.setItem('authToken', access_token);
   
-      // Redirect to dashboard
       navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');

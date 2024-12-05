@@ -9,7 +9,7 @@ const HomePage = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       const token = localStorage.getItem('authToken');
-      setUserIsLoggedIn(!token);   // CHECK THIS {DOES NOT WORK} 
+      setUserIsLoggedIn(!token);  
     };
 
     checkAuthStatus();

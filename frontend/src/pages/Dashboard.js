@@ -78,18 +78,6 @@ const Dashboard = () => {
     }
   };
 
-  // const fetchStudyHistory = async (id, timePeriod = 'all') => {
-  //   try {
-  //     const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_history`, {
-  //       params: { time_period: timePeriod },
-  //     });
-  //     //console.log('Study History:', response);
-  //   } catch (error) {
-  //     console.error('Error fetching study history:', error);
-  //   }
-  // };
-
-  
 
   const acceptFlashCards = async (id, flashcards) => {
     try {
@@ -117,10 +105,7 @@ const Dashboard = () => {
       
       const title = titleLine.replace('Title: ', '').trim();
       const description = descriptionLine.replace('Description: ', '').trim();
-      
-      // console.log('Title:', title);
-      // console.log('Description:', description);
-      
+     
           
   
       const studySetData = {
@@ -136,7 +121,7 @@ const Dashboard = () => {
         studySetData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`, // Ensure authToken is present in localStorage
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`, 
           },
           withCredentials: true,
         }
@@ -167,7 +152,6 @@ const Dashboard = () => {
   useEffect(() => {
     if (userId) {
       fetchStudySets(userId);
-      //fetchStudyHistory(userId);
 
     }
   }, [userId]);
@@ -208,9 +192,6 @@ const Dashboard = () => {
         }
       );
   
-      //console.log('Groq API Response:', response.data.choices[0].message.content);
-  
-      // Parse response to extract flashcards
       const generatedText = response.data.choices[0].message.content || '';
       const lines = generatedText.split('\n');
       let currentCard = { front: '', back: '' };
@@ -218,7 +199,7 @@ const Dashboard = () => {
       for (const line of lines) {
         if (line.startsWith('Front:')) {
           if (currentCard.front && currentCard.back) {
-            // Push the completed card before starting a new one
+            
             cards.push({ ...currentCard });
             currentCard = { front: '', back: '' };
           }
@@ -228,12 +209,12 @@ const Dashboard = () => {
         }
       }
   
-      // Add the last card if complete
+      
       if (currentCard.front && currentCard.back) {
         cards.push({ ...currentCard });
       }
       console.log('Generated Flashcards:', cards);
-      setFlashcards(cards); // Populate the state with flashcards
+      setFlashcards(cards); 
     } catch (error) {
       console.error('Error calling Groq API:', error);
       setFlashcards([

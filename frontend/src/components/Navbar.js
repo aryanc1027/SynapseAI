@@ -13,8 +13,8 @@ const NavBar = () => {
   }
 
   const handleLogout = () => {
-    authService.logout(); // This will remove the token from localStorage
-    logout(); // This will update the user state in the context
+    authService.logout(); 
+    logout(); 
     navigate('/');
   };
 

@@ -1,11 +1,9 @@
-/* General styles */
 body {
   font-family: Arial, sans-serif;
   line-height: 1.6;
   color: #333;
 }
 
-/* Dashboard layout */
 .bg-indigo-50 {
   background-color: #eef2ff;
 }
@@ -46,22 +44,21 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* Flashcard container */
 .flashcard-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 3rem; /* Increased gap between cards */
+  gap: 3rem; 
   justify-content: center;
-  padding: 1.5rem; /* Increased padding */
+  padding: 1.5rem; 
 }
 
-/* Flashcard styles */
+
 .flashcard {
   width: 200px;
   height: 150px;
   perspective: 1000px;
   cursor: pointer;
-  margin: 1.5rem; /* Increased margin */
+  margin: 1.5rem; 
 }
 
 .flashcard-inner {
@@ -102,7 +99,7 @@ body {
   transform: rotateY(180deg);
 }
 
-/* Form styles */
+
 textarea,
 input[type="number"] {
   width: 100%;
@@ -133,17 +130,16 @@ button:disabled {
 
 
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .md\:grid-cols-2 {
     grid-template-columns: 1fr;
   }
   
   .flashcard-container {
-    gap: 2rem; /* Slightly reduced gap for smaller screens */
+    gap: 2rem; 
   }
   
   .flashcard {
-    margin: 1rem; /* Slightly reduced margin for smaller screens */
+    margin: 1rem; 
   }
 }
