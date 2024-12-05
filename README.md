@@ -29,7 +29,7 @@ These instructions will get you a copy of the project up and running on your loc
   ```
 - To create the local database:
   ```bash
-  CREATE DATABASE study_platform;
+  CREATE DATABASE qt_db;
   ```
 - To create a new user:
   ```bash
