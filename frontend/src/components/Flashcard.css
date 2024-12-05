@@ -1,11 +1,11 @@
 .flashcard {
-  width: 40vh; /* Reduced width */
-  height: 25vh; /* Reduced height */
+  width: 40vh; 
+  height: 25vh;
   perspective: 1000px;
   margin: 15px;
   flex-shrink: 0;
   transition: all 0.3s ease;
-  border-radius: 20px; /* Keep rounded edges */
+  border-radius: 20px; 
 }
 
 .flashcard:hover {
@@ -14,7 +14,7 @@
 }
 
 .flashcard.flipped {
-  z-index: 20; /* Ensure flipped card appears above the others */
+  z-index: 20; 
 }
 
 .flashcard-inner {
@@ -38,7 +38,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 20px; /* Round the edges of the front and back */
+  border-radius: 20px; 
   box-shadow: 0 4px 8px rgba(0, 255, 245, 0.2);
   padding: 16px;
   overflow: hidden;
@@ -56,6 +56,6 @@
 }
 
 .flashcard p {
-  font-size: 18px; /* Reduced font size */
+  font-size: 18px; 
   line-height: 1.5;
 }
