@@ -14,34 +14,80 @@ const Study = () => {
   const [isCompleted, setIsCompleted] = useState(false);
 
 
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchStudySet = async () => {
-      try {
-        const response = await axios.get(`${API_BASE_URL}/study/study_sets/${id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-          },
-        });
-        setStudySet(response.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching study set:', error);
-        setIsLoading(false);
-      }
-    };
 
-    fetchStudySet();
-    //updateProgress();
 
-   
-  }, [id,studySet]);
-
-  const updateProgress = useCallback(async () => {
+useEffect(() => {
+  const fetchStudySet = async () => {
     try {
-      const progress = Math.round(((completedCards.length + 1) / studySet.flashcards.length) * 100);
+      const response = await axios.get(`${API_BASE_URL}/study/study_sets/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      });
+      setStudySet(response.data);
+      setIsLoading(false);
+      
+      // Check if the study set is completed
+      if (response.data.progress === 100) {
+        setIsCompleted(true);
+        setCompletedCards(response.data.flashcards.map((_, index) => index));
+      }
+    } catch (error) {
+      console.error('Error fetching study set:', error);
+      setIsLoading(false);
+    }
+  };
+
+  fetchStudySet();
+}, [id]);
+
+// const updateProgress = useCallback(async () => {
+//   try {
+//     const progress = calculate_progress(completedCards, studySet.flashcards.length);
+
+//     await axios.put(
+//       `${API_BASE_URL}/study/progress/${id}`,
+//       { progress }, 
+//       {
+//         headers: {
+//           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+//         },
+//       }
+//     );
+
+//     setStudySet(prevStudySet => ({
+//       ...prevStudySet,
+//       progress: progress
+//     }));
+
+//     console.log('Progress updated successfully');
+//   } catch (error) {
+//     console.error('Error updating progress:', error);
+//     if (error.response) {
+//       console.error('Backend response:', error.response.data);
+//     }
+//   }
+// }, [id, completedCards, studySet]);
+
+const calculate_progress = (completed_cards, total_cards) => {
+  if (total_cards === 0) {
+    return 0;
+  }
+  return Math.round((completed_cards.length / total_cards) * 100);
+};
   
+  const handleNavigation = useCallback(() => {
+
+    navigate(-1);
+  }, [navigate]);
+
+  const handleFlip = () => setIsFlipped(!isFlipped);
+
+  const updateProgressInDB = useCallback(async (progress) => {
+    try {
       await axios.put(
         `${API_BASE_URL}/study/progress/${id}`,
         { progress }, 
@@ -51,54 +97,86 @@ const Study = () => {
           },
         }
       );
-      console.log('Progress updated successfully');
+      console.log('Progress updated successfully in DB');
     } catch (error) {
-      console.error('Error updating progress:', error);
+      console.error('Error updating progress in DB:', error);
+    }
+  }, [id]);
+
+  const handleNext = useCallback((correct) => {
+    setCompletedCards(prevCompletedCards => {
+      let newCompletedCards = prevCompletedCards;
+      if (correct) {
+        newCompletedCards = [...prevCompletedCards, currentCardIndex];
+      }
   
+      const remainingCards = studySet.flashcards.filter((_, index) => 
+        !newCompletedCards.includes(index) && index !== currentCardIndex
+      );
+      
+      let nextIndex;
+      if (remainingCards.length > 0) {
+        nextIndex = studySet.flashcards.findIndex((_, index) => 
+          !newCompletedCards.includes(index) && index !== currentCardIndex
+        );
+      } else if (!correct) {
+        // If no new cards and current card was incorrect, go back to the first incorrect card
+        nextIndex = studySet.flashcards.findIndex((_, index) => 
+          !newCompletedCards.includes(index)
+        );
+      } else {
+        // All cards completed
+        setIsCompleted(true);
+      }
+  
+      if (nextIndex !== undefined) {
+        setCurrentCardIndex(nextIndex);
+      }
+  
+      setIsFlipped(false);
+  
+
+      const newProgress = calculate_progress(newCompletedCards, studySet.flashcards.length);
+      setStudySet(prevStudySet => ({
+        ...prevStudySet,
+        progress: newProgress
+      }));
+  
+
+      updateProgressInDB(newProgress);
+  
+      return newCompletedCards;
+    });
+  }, [currentCardIndex, studySet, updateProgressInDB]);
+  
+  const handleReset = async () => {
+    try {
+      await axios.put(
+        `${API_BASE_URL}/study/progress/${id}`,
+        { progress: 0 },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        }
+      );
+  
+      setCompletedCards([]);
+      setCurrentCardIndex(0);
+      setIsCompleted(false);
+      setIsFlipped(false);
+      setStudySet(prevStudySet => ({
+        ...prevStudySet,
+        progress: 0
+      }));
+  
+      console.log('Progress reset successfully');
+    } catch (error) {
+      console.error('Error resetting progress:', error);
       if (error.response) {
         console.error('Backend response:', error.response.data);
       }
     }
-  }, [id, completedCards, studySet]);
-  
-  const handleNavigation = useCallback(() => {
-
-    navigate(-1);
-  }, [navigate]);
-
-  const handleFlip = () => setIsFlipped(!isFlipped);
-
-  const handleNext = (correct) => {
-    if (correct) {
-      setCompletedCards([...completedCards, currentCardIndex]);
-      
-      const remainingCards = studySet.flashcards.filter((_, index) => 
-        !completedCards.includes(index) && index !== currentCardIndex
-      );
-      
-      if (remainingCards.length > 0) {
-        const nextIndex = studySet.flashcards.findIndex((_, index) => 
-          !completedCards.includes(index) && index !== currentCardIndex
-        );
-        setCurrentCardIndex(nextIndex);
-      } else {
-        // Study session completed
-        setIsCompleted(true);
-        updateProgress();
-      }
-      
-      setIsFlipped(false);
-    } else {
-      // If incorrect, just flip the card back
-      setIsFlipped(false);
-    }
-    updateProgress();
-  };
-  const handleReset = () => {
-    setCompletedCards([]);
-    setCurrentCardIndex(0);
-    setIsCompleted(false);
-    setIsFlipped(false);
   };
 
   if (isLoading) {

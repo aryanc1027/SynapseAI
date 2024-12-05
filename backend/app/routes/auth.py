@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from backend.app.schemas.user import UserCreate
 from backend.app.utils.auth import get_password_hash
 from passlib.context import CryptContext
+import time 
 
 router = APIRouter(
     prefix="/api/auth",
@@ -25,6 +26,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+blacklistedtokens = set()
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -67,6 +69,7 @@ async def login(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+
 @router.get("/me")
 async def read_users_me(current_user: User = Depends(get_current_user)):
     """Get current user's information"""
@@ -75,7 +78,6 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
         "username": current_user.username,
         "email": current_user.email,
     }
-
 
 @router.post("/register")
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -96,3 +98,25 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return {"message": "User registered successfully"}
+
+@router.post("/logout")
+async def logout(token: str = Depends(oauth2_scheme)):
+    try:
+        # Validate the token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        
+        # Add the token to the blacklist
+        # In a real application, you'd want to use a database or Redis for this
+        expiration = payload.get("exp", time.time() + 300)  # Default to 5 minutes from now if no expiration
+        blacklisted_tokens[token] = expiration
+        
+        # Clean up old tokens
+        current_time = time.time()
+        blacklisted_tokens = {t: exp for t, exp in blacklisted_tokens.items() if exp > current_time}
+        
+        return {"message": "Successfully logged out"}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
