@@ -4,7 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import { authService } from '../services/authService';
 
 const NavBar = () => {
-  const { logout } = useUser();
+  const { user, logout } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -13,8 +13,8 @@ const NavBar = () => {
   }
 
   const handleLogout = () => {
-    authService.logout(); 
-    logout(); 
+    authService.logout();
+    logout();
     navigate('/');
   };
 
@@ -28,12 +28,29 @@ const NavBar = () => {
           <Link to="/dashboard" className="text-[#aff195] hover:text-white transition duration-300">
             Dashboard
           </Link>
-          <button
-            onClick={handleLogout}
-            className="bg-[#59a742] text-white px-4 py-2 rounded-full hover:bg-[#aff195] hover:text-[#0a260c] transition duration-300"
-          >
-            Sign Out
-          </button>
+          {!user ? (
+            <>
+              <Link
+                to="/login"
+                className="bg-[#59a742] text-white px-4 py-2 rounded-full hover:bg-[#aff195] hover:text-[#0a260c] transition duration-300"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/register"
+                className="bg-[#59a742] text-white px-4 py-2 rounded-full hover:bg-[#aff195] hover:text-[#0a260c] transition duration-300"
+              >
+                Register
+              </Link>
+            </>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="bg-[#59a742] text-white px-4 py-2 rounded-full hover:bg-[#aff195] hover:text-[#0a260c] transition duration-300"
+            >
+              Sign Out
+            </button>
+          )}
         </div>
       </div>
     </nav>

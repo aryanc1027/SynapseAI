@@ -50,17 +50,17 @@
 }
 
 .flashcard-front {
-  background-color: #e0e7ff; 
-  color: #4f46e5; 
+  background-color: #e0ffe6; 
+  color: #46e570; 
 }
 
 .flashcard-back {
-  background-color: #c7d2fe; 
-  color: #4f46e5; 
+  background-color: #c7fee2; 
+  color: #46e583; 
   transform: rotateY(180deg);
 }
 
 .flashcard p {
-  font-size: 14px;
+  font-size: 17px;
   line-height: 1.4;
 }

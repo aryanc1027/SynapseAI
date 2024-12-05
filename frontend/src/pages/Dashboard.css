@@ -5,7 +5,7 @@ body {
 }
 
 .bg-indigo-50 {
-  background-color: #eef2ff;
+  background-color: #e8f5e9; 
 }
 
 .min-h-screen {
@@ -47,18 +47,17 @@ body {
 .flashcard-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 3rem; 
+  gap: 2rem; 
   justify-content: center;
-  padding: 1.5rem; 
+  padding: 1.5rem;
 }
 
-
 .flashcard {
-  width: 200px;
-  height: 150px;
+  width: 250px; 
+  height: 220px; 
   perspective: 1000px;
   cursor: pointer;
-  margin: 1.5rem; 
+  margin: 1rem; 
 }
 
 .flashcard-inner {
@@ -86,60 +85,68 @@ body {
   border-radius: 0.5rem;
   padding: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 20px;
 }
 
 .flashcard-front {
-  background-color: #e0e7ff;
-  color: #4f46e5;
+  background-color: #c8e6c9; 
+  color: #2e7d32; 
 }
 
 .flashcard-back {
-  background-color: #c7d2fe;
-  color: #4f46e5;
+  background-color: #a5d6a7; 
+  color: #2e7d32; 
   transform: rotateY(180deg);
 }
-
 
 textarea,
 input[type="number"] {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #a5d6a7; 
   border-radius: 0.25rem;
   margin-bottom: 0.5rem;
 }
 
 button {
-  background-color: #4f46e5;
+  background: linear-gradient(145deg, #3d8c40, #367d39); 
   color: white;
   padding: 0.5rem 1rem;
   border: none;
   border-radius: 0.25rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  font-weight: bold; /* Bold font */
+  font-size: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-  background-color: #4338ca;
+  background: linear-gradient(145deg, #629a5b, #2f6e32); 
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(1px); 
 }
 
 button:disabled {
-  background-color: #9ca3af;
+  background: linear-gradient(145deg, #a5d6a7, #94c196); 
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
-
-
-
 @media (max-width: 768px) {
   .md\:grid-cols-2 {
     grid-template-columns: 1fr;
   }
   
   .flashcard-container {
-    gap: 2rem; 
+    gap: 1.5rem; 
   }
   
   .flashcard {
-    margin: 1rem; 
+    margin: 0.75rem;
   }
 }

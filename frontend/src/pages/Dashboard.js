@@ -225,109 +225,96 @@ const Dashboard = () => {
     setIsLoading(false);
   };
   
-
-  return (
-    <div className="bg-indigo-50 min-h-screen p-8">
-      <h1 className="text-3xl font-bold text-indigo-800 mb-6">Your Dashboard</h1>
-      <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold mb-4">Study Progress</h2>
-          {studySets.length > 0 ? (
-            <ProgressCircle
-              progress={studySets[0].progress}
-              title={studySets[0].title}
-            />
-          ) : (
-            <p>No study sets available</p>
-          )}
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Recent Study Sets</h2>
-            <div className="max-h-60 overflow-y-auto">
-            {studySets
-              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-              .map((set) => (
-                <div 
-                  key={set.id}
-                  className="mb-4 p-4 border rounded-lg shadow cursor-pointer hover:bg-gray-100"
-                  onClick={() => navigate(`/study/${set.id}`)}
-                >
-                  <h3 className="font-medium text-lg">{set.title}</h3>
-                  <p className="text-gray-600">{set.description}</p>
-                  <p className="text-gray-600">{set.progress}%</p>
-                </div>
-              ))
-            }
-            </div>
-          </div>
-      </div>
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-semibold mb-4">Flashcard Generator</h2>
-        <form onSubmit={handleSubmit} className="mb-4">
-          <textarea
-            className="w-full p-2 border border-gray-300 rounded mb-2"
-            rows="4"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Enter your prompt here..."
-          ></textarea>
-          <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Or upload a PDF file
-            </label>
-            <input
-              type="file"
-              accept=".pdf"
-              onChange={handleFileChange}
-              className="mt-1"
-            />
-          </div>
-          <div className="mb-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Number of flashcards (max 20)
-            </label>
-            <input
-              type="number"
-              min="1"
-              max="20"
-              value={numCards}
-              onChange={(e) =>
-                setNumCards(Math.min(20, Math.max(1, parseInt(e.target.value) || 1)))
-              }
-              className="mt-1 p-2 border border-gray-300 rounded"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Processing...' : 'Generate Flashcards'}
-          </button>
-          <button
-            type="button"
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            onClick={handleAddToDb}
-            disabled={isLoading || flashcards.length === 0}
-          >
-            {isLoading ? 'Processing...' : 'Add to Database'}
-          </button>
-        </form>
-        {flashcards.length > 0 && (
-          <div className="flashcard-container mt-6">
-            <h2 className="text-xl font-semibold mb-4">Generated Flashcards</h2>
-            {flashcards.map((card, index) => (
-              <Flashcard
-                key={index}
-                frontText={card.front}
-                backText={card.back}
-              />
-            ))}
-          </div>
+return (
+  <div className="bg-gradient-to-b from-[#c8ffc9] to-[#e8ffe9] min-h-screen p-8">
+    <h1 className="text-4xl font-bold text-[#217e38] mb-6">Your Dashboard</h1>
+    <div className="grid md:grid-cols-2 gap-6 mb-6">
+      <div className="bg-[#eeffee] p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+        <h2 className="text-2xl font-semibold mb-4 text-[#59a742]">Study Progress</h2>
+        {studySets.length > 0 ? (
+          <ProgressCircle
+            progress={studySets[0].progress}
+            title={studySets[0].title}
+          />
+        ) : (
+          <p className="text-[#0a260c]">No study sets available</p>
         )}
       </div>
+      <div className="bg-[#eeffee] p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+        <h2 className="text-2xl font-semibold mb-4 text-[#59a742]">Recent Study Sets</h2>
+        <div className="max-h-60 overflow-y-auto">
+          {studySets
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            .map((set) => (
+              <div 
+                key={set.id}
+                className="mb-4 p-4 border border-[#aff195] rounded-lg shadow cursor-pointer hover:bg-[#f0faf0] transition duration-300"
+                onClick={() => navigate(`/study/${set.id}`)}
+              >
+                <h3 className="font-medium text-lg text-[#217e38]">{set.title}</h3>
+                <p className="text-[#59a742]">{set.description}</p>
+                <p className="text-[#59a742]">{set.progress}%</p>
+              </div>
+            ))
+          }
+        </div>
+      </div>
     </div>
-  );
+    <div className="bg-[#eeffee] p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+      <h2 className="text-2xl font-semibold mb-4 text-[#59a742]">Flashcard Generator</h2>
+      <form onSubmit={handleSubmit} className="mb-4">
+        <textarea
+          className="w-full p-2 border border-[#ggf195] rounded mb-2 focus:outline-none focus:ring-2 focus:ring-[#59a742] bg-gradient-to-r from-[#e6f7e6] to-[#f0faf0] font-bold text-[#054a1f]"
+          rows="4"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter your prompt here..."
+        ></textarea>
+        <div className="mb-2">
+          <label className="block text-sm font-medium text-[#217e38]">
+            Number of flashcards (max 20)
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="20"
+            value={numCards}
+            onChange={(e) =>
+              setNumCards(Math.min(20, Math.max(1, parseInt(e.target.value) || 1)))
+            }
+            className="mt-1 p-2 border border-[#aff195] rounded focus:outline-none focus:ring-2 focus:ring-[#59a742] bg-gradient-to-r from-[#e6f7e6] to-[#f0faf0] font-bold text-[#054a1f]"
+          />
+        </div>
+        <button
+          type="submit"
+          className="bg-[#59a742] text-white px-6 py-2 rounded-full hover:bg-[#217e38] transition duration-300 mr-2"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Processing...' : 'Generate Flashcards'}
+        </button>
+        <button
+          type="button"
+          className="bg-[#defadc] text-[#054a1f] px-6 py-2 rounded-full hover:bg-[#59a742] hover:text-white transition duration-300"
+          onClick={handleAddToDb}
+          disabled={isLoading || flashcards.length === 0}
+        >
+          {isLoading ? 'Processing...' : 'Add to Study Sets'}
+        </button>
+      </form>
+      {flashcards.length > 0 && (
+        <div className="flashcard-container mt-6">
+          <h2 className="text-2xl font-semibold mb-4 text-[#59a742]">Generated Flashcards</h2>
+          {flashcards.map((card, index) => (
+            <Flashcard
+              key={index}
+              frontText={card.front}
+              backText={card.back}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+);
 };
-
-export default Dashboard;
+export default Dashboard
