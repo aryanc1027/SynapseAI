@@ -25,7 +25,7 @@ const Dashboard = () => {
 
 
   const cards = [];
-
+  // eslint-disable-next-line
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };

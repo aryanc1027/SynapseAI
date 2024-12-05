@@ -5,6 +5,7 @@ import { authService } from '../services/authService';
 import { FaArrowLeft } from 'react-icons/fa';
 
 const NavBar = () => {
+  // eslint-disable-next-line
   const { user, logout } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
