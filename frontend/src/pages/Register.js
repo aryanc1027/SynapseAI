@@ -16,7 +16,7 @@ const Register = () => {
     e.preventDefault();
     try {
       await register(userData);
-      navigate('/dashboard');
+      navigate('/login');
     } catch (err) {
       setError('Registration failed. Please try again.');
     }

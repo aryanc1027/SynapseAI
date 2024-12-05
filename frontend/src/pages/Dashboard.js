@@ -143,6 +143,7 @@ const Dashboard = () => {
       fetchStudySets(userId);
     } else {
       console.error('User ID not available or no flashcards to add');
+      console.log(userId, flashcards);
     }
   };
   useEffect(() => {
@@ -272,7 +273,7 @@ const Dashboard = () => {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter your prompt here..."
           ></textarea>
-          <div className="mb-2">
+          {/* <div className="mb-2">
             <label className="block text-sm font-medium text-gray-700">
               Or upload a PDF file
             </label>
@@ -282,7 +283,7 @@ const Dashboard = () => {
               onChange={handleFileChange}
               className="mt-1"
             />
-          </div>
+          </div> */}
           <div className="mb-2">
             <label className="block text-sm font-medium text-gray-700">
               Number of flashcards (max 20)

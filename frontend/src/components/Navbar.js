@@ -12,10 +12,10 @@ const NavBar = () => {
   if (location.pathname === '/') return null;
 
   const handleLogout = () => {
-    if (user) {
+
       authService.logout();
       logout();
-    }
+
     navigate('/');
   };
 

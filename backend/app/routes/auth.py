@@ -53,7 +53,7 @@ async def get_current_user(
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @router.post("/token")
 async def login(
-    email: str = Form(...),  # Changed from 'username' to 'email'
+    email: str = Form(...), 
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
@@ -64,8 +64,8 @@ async def login(
     if not pwd_context.verify(password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
-    # Generate a real JWT token
-    access_token = create_access_token(data={"sub": user.username})  # Use user's unique identifier
+
+    access_token = create_access_token(data={"sub": user.username}) 
     return {"access_token": access_token, "token_type": "bearer"}
 
 
@@ -81,14 +81,12 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 
 @router.post("/register")
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if email or username already exists
     existing_user = db.query(User).filter(
         (User.username == user.username) | (User.email == user.email)
     ).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already taken")
     
-    # Create new user
     new_user = User(
         username=user.username,
         email=user.email,
@@ -102,18 +100,14 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
 @router.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
     try:
-        # Validate the token
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
         
-        # Add the token to the blacklist
-        # In a real application, you'd want to use a database or Redis for this
-        expiration = payload.get("exp", time.time() + 300)  # Default to 5 minutes from now if no expiration
+        expiration = payload.get("exp", time.time() + 300)  
         blacklisted_tokens[token] = expiration
         
-        # Clean up old tokens
         current_time = time.time()
         blacklisted_tokens = {t: exp for t, exp in blacklisted_tokens.items() if exp > current_time}
         

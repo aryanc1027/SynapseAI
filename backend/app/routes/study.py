@@ -27,8 +27,8 @@ class StudySetCreate(BaseModel):
     title: str
     description: str
     user_id: int
-    flashcards: List[FlashcardCreate] # Include flashcards when creating a study set
-    progress: int = 0  # Default progress value
+    flashcards: List[FlashcardCreate] 
+    progress: int = 0  
 
 
 class StudySetUpdate(StudySetBase):
@@ -39,7 +39,7 @@ class StudySetResponse(StudySetBase):
     user_id: int
     created_at: datetime
     flashcards: List[FlashcardResponse]
-    progress: int  # Include progress in the response
+    progress: int  
 
     class Config:
         from_attributes = True
@@ -228,13 +228,13 @@ def create_study_set(
         title=study_set_data.title,
         description=study_set_data.description,
         user_id=user_id,
-        progress=study_set_data.progress  # Set the progress value
+        progress=study_set_data.progress   
     )
     print(study_set_data)
     new_study_set.flashcards = [
         Flashcard(front=flashcard.front, back=flashcard.back)
        
-        for flashcard in study_set_data.flashcards   # error here
+        for flashcard in study_set_data.flashcards  
     ]
    
 
