@@ -26,7 +26,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
-blacklistedtokens = set()
+
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),

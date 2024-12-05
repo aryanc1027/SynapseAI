@@ -2,39 +2,47 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { authService } from '../services/authService';
+import { FaArrowLeft } from 'react-icons/fa';
 
 const NavBar = () => {
-  const { logout } = useUser();
+  const { user, logout } = useUser();
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (location.pathname === '/') {
-    return null;
-  }
+  if (location.pathname === '/') return null;
 
   const handleLogout = () => {
-    authService.logout(); 
-    logout(); 
+    if (user) {
+      authService.logout();
+      logout();
+    }
     navigate('/');
   };
 
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
   return (
-    <nav className="bg-gradient-to-r from-[#0a260c] to-[#217e38] p-4 shadow-md">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link to="/" className="text-[#aff195] text-2xl font-bold hover:text-white transition duration-300">
-          SynapseAI
-        </Link>
-        <div className="space-x-6">
-          <Link to="/dashboard" className="text-[#aff195] hover:text-white transition duration-300">
-            Dashboard
+    <nav className="w-full bg-[#0a1a2a] p-4 shadow-md">
+      <div className="flex justify-between items-center">
+        {isAuthPage ? (
+          <Link to="/" className="text-[#00fff5] hover:text-white transition duration-300">
+            <FaArrowLeft size={24} />
           </Link>
-          <button
-            onClick={handleLogout}
-            className="bg-[#59a742] text-white px-4 py-2 rounded-full hover:bg-[#aff195] hover:text-[#0a260c] transition duration-300"
-          >
-            Sign Out
-          </button>
-        </div>
+        ) : (
+          <>
+            <Link to="/" className="text-[#00fff5] text-2xl font-bold hover:text-white transition duration-300">
+              SynapseAI
+            </Link>
+            <div className="space-x-4">
+              <button
+                onClick={handleLogout}
+                className="bg-[#4a5d7e] text-white px-4 py-2 rounded-full hover:bg-[#00fff5] hover:text-[#0a1a2a] transition duration-300"
+              >
+                Sign Out
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </nav>
   );

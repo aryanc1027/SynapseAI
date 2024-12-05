@@ -23,23 +23,24 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0a1a2a] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      
+      </div>
+  
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-[#1a2a3a] py-8 px-4 shadow sm:rounded-lg sm:px-10">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-[#00fff5] padding 10px">
           Create your account
         </h2>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+              <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded relative" role="alert">
                 <span className="block sm:inline">{error}</span>
               </div>
             )}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="username" className="block text-sm font-medium text-[#a0a7b7]">
                 Username
               </label>
               <div className="mt-1">
@@ -48,16 +49,16 @@ const Register = () => {
                   name="username"
                   type="text"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-[#4a5d7e] rounded-md shadow-sm placeholder-[#6a7a8a] bg-[#2a3a4a] text-[#e0e7ff] focus:outline-none focus:ring-[#00fff5] focus:border-[#00fff5] sm:text-sm"
                   value={userData.username}
                   onChange={(e) => setUserData({...userData, username: e.target.value})}
                   placeholder="Enter your username"
                 />
               </div>
             </div>
-
+  
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-medium text-[#a0a7b7]">
                 Email address
               </label>
               <div className="mt-1">
@@ -67,16 +68,16 @@ const Register = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-[#4a5d7e] rounded-md shadow-sm placeholder-[#6a7a8a] bg-[#2a3a4a] text-[#e0e7ff] focus:outline-none focus:ring-[#00fff5] focus:border-[#00fff5] sm:text-sm"
                   value={userData.email}
                   onChange={(e) => setUserData({...userData, email: e.target.value})}
                   placeholder="Enter your email"
                 />
               </div>
             </div>
-
+  
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-medium text-[#a0a7b7]">
                 Password
               </label>
               <div className="mt-1">
@@ -86,18 +87,18 @@ const Register = () => {
                   type="password"
                   autoComplete="new-password"
                   required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="appearance-none block w-full px-3 py-2 border border-[#4a5d7e] rounded-md shadow-sm placeholder-[#6a7a8a] bg-[#2a3a4a] text-[#e0e7ff] focus:outline-none focus:ring-[#00fff5] focus:border-[#00fff5] sm:text-sm"
                   value={userData.password}
                   onChange={(e) => setUserData({...userData, password: e.target.value})}
                   placeholder="Enter your password"
                 />
               </div>
             </div>
-
+  
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#0a1a2a] bg-[#00fff5] hover:bg-[#00cccc] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00fff5] transition duration-300"
               >
                 Register
               </button>

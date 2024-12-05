@@ -28,18 +28,19 @@ export const authService = {
       if (!response.ok) {
         throw new Error('Login failed');
       }
-  
       const data = await response.json();
-      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('authToken', data.access_token);
+
       return data;
     },
     logout() {
-      localStorage.removeItem('token');
+      localStorage.removeItem('authToken');
+      console.log('Logout successful');
     },
     async getCurrentUser() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
+      console.log('Token:', token);
       if (!token) throw new Error('No token found');
-  
       const response = await fetch(`${API_BASE_URL}/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,25 +1,20 @@
-.flashcard-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 250px;
-  width: 100%;
-  padding: 20px;
-  flex-wrap: wrap;
-}
-
 .flashcard {
-  width: 200px;
-  height: 150px;
+  width: 40vh; /* Reduced width */
+  height: 25vh; /* Reduced height */
   perspective: 1000px;
-  margin: 10px;
+  margin: 15px;
   flex-shrink: 0;
   transition: all 0.3s ease;
+  border-radius: 20px; /* Keep rounded edges */
 }
 
 .flashcard:hover {
   transform: translateY(-10px);
   z-index: 10;
+}
+
+.flashcard.flipped {
+  z-index: 20; /* Ensure flipped card appears above the others */
 }
 
 .flashcard-inner {
@@ -43,24 +38,24 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 20px; /* Round the edges of the front and back */
+  box-shadow: 0 4px 8px rgba(0, 255, 245, 0.2);
   padding: 16px;
   overflow: hidden;
 }
 
 .flashcard-front {
-  background-color: #e0e7ff; 
-  color: #4f46e5; 
+  background-color: #1a2a3a;
+  color: #00fff5;
 }
 
 .flashcard-back {
-  background-color: #c7d2fe; 
-  color: #4f46e5; 
+  background-color: #2a3a4a;
+  color: #00fff5;
   transform: rotateY(180deg);
 }
 
 .flashcard p {
-  font-size: 14px;
-  line-height: 1.4;
+  font-size: 18px; /* Reduced font size */
+  line-height: 1.5;
 }

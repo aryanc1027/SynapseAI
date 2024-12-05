@@ -147,6 +147,7 @@ const Dashboard = () => {
   };
   useEffect(() => {
     fetchUserId();
+    //console.log(localStorage.getItem('token'));
   }, []);
 
   useEffect(() => {
@@ -180,7 +181,7 @@ const Dashboard = () => {
           messages: [
             {
               role: 'user',
-              content: `Generate ${numCards} flashcards from the following text. Format each flashcard as "Front: [question]" followed by "Back: [answer]" on the next line. Do not include any other text or formatting.\n\n${textToProcess}`,
+              content: `Generate ${numCards} flashcards from the following text. Format each flashcard as "Front: [question]" followed by "Back: [answer]" on the next line. Do not include any other text or formatting.Make sure there is exactly ${numCards} flashcards.\n\n${textToProcess}`,
             },
           ],
         },
@@ -306,16 +307,16 @@ const Dashboard = () => {
           </button>
           <button
             type="button"
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 text-white px-4 py-2 pl-4 rounded hover:bg-green-700 ml-4"
             onClick={handleAddToDb}
             disabled={isLoading || flashcards.length === 0}
           >
-            {isLoading ? 'Processing...' : 'Add to Database'}
+            {isLoading ? 'Processing...' : 'Add to Study Sets'}
           </button>
         </form>
         {flashcards.length > 0 && (
           <div className="flashcard-container mt-6">
-            <h2 className="text-xl font-semibold mb-4">Generated Flashcards</h2>
+
             {flashcards.map((card, index) => (
               <Flashcard
                 key={index}
