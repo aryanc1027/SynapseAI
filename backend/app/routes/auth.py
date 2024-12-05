@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 from backend.app.schemas.user import UserCreate
 from backend.app.utils.auth import get_password_hash
 from passlib.context import CryptContext
+import time 
 
 router = APIRouter(
     prefix="/api/auth",
@@ -25,6 +26,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -51,7 +53,7 @@ async def get_current_user(
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @router.post("/token")
 async def login(
-    email: str = Form(...),  # Changed from 'username' to 'email'
+    email: str = Form(...), 
     password: str = Form(...),
     db: Session = Depends(get_db)
 ):
@@ -62,9 +64,10 @@ async def login(
     if not pwd_context.verify(password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
-    # Generate a real JWT token
-    access_token = create_access_token(data={"sub": user.username})  # Use user's unique identifier
+
+    access_token = create_access_token(data={"sub": user.username}) 
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 
 @router.get("/me")
@@ -76,17 +79,14 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
         "email": current_user.email,
     }
 
-
 @router.post("/register")
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if email or username already exists
     existing_user = db.query(User).filter(
         (User.username == user.username) | (User.email == user.email)
     ).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already taken")
     
-    # Create new user
     new_user = User(
         username=user.username,
         email=user.email,
@@ -96,3 +96,21 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return {"message": "User registered successfully"}
+
+@router.post("/logout")
+async def logout(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        
+        expiration = payload.get("exp", time.time() + 300)  
+        blacklisted_tokens[token] = expiration
+        
+        current_time = time.time()
+        blacklisted_tokens = {t: exp for t, exp in blacklisted_tokens.items() if exp > current_time}
+        
+        return {"message": "Successfully logged out"}
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")

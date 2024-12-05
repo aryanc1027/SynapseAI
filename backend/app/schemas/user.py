@@ -1,18 +1,18 @@
-from pydantic import BaseModel, EmailStr  # Use EmailStr for validation
+from pydantic import BaseModel, EmailStr  
 from typing import List, Optional
 
-# Base User schema with common attributes
+
 class UserBase(BaseModel):
     username: str
-    email: EmailStr  # Add email field with validation
+    email: EmailStr  
 
-# Schema for creating a user
+
 class UserCreate(UserBase):
-    password: str  # Plain password for creation only
+    password: str  
 
-# Schema for returning user data
+
 class User(UserBase):
     id: int
     
     class Config:
-        from_attributes = True  # Allows conversion from ORM model
+        from_attributes = True 

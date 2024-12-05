@@ -78,18 +78,6 @@ const Dashboard = () => {
     }
   };
 
-  // const fetchStudyHistory = async (id, timePeriod = 'all') => {
-  //   try {
-  //     const response = await axios.get(`${API_BASE_URL}/study/users/${id}/study_history`, {
-  //       params: { time_period: timePeriod },
-  //     });
-  //     //console.log('Study History:', response);
-  //   } catch (error) {
-  //     console.error('Error fetching study history:', error);
-  //   }
-  // };
-
-  
 
   const acceptFlashCards = async (id, flashcards) => {
     try {
@@ -117,10 +105,7 @@ const Dashboard = () => {
       
       const title = titleLine.replace('Title: ', '').trim();
       const description = descriptionLine.replace('Description: ', '').trim();
-      
-      // console.log('Title:', title);
-      // console.log('Description:', description);
-      
+     
           
   
       const studySetData = {
@@ -136,7 +121,7 @@ const Dashboard = () => {
         studySetData,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('authToken')}`, // Ensure authToken is present in localStorage
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`, 
           },
           withCredentials: true,
         }
@@ -158,16 +143,17 @@ const Dashboard = () => {
       fetchStudySets(userId);
     } else {
       console.error('User ID not available or no flashcards to add');
+      console.log(userId, flashcards);
     }
   };
   useEffect(() => {
     fetchUserId();
+    //console.log(localStorage.getItem('token'));
   }, []);
 
   useEffect(() => {
     if (userId) {
       fetchStudySets(userId);
-      //fetchStudyHistory(userId);
 
     }
   }, [userId]);
@@ -196,7 +182,7 @@ const Dashboard = () => {
           messages: [
             {
               role: 'user',
-              content: `Generate ${numCards} flashcards from the following text. Format each flashcard as "Front: [question]" followed by "Back: [answer]" on the next line. Do not include any other text or formatting.\n\n${textToProcess}`,
+              content: `Generate ${numCards} flashcards from the following text. Format each flashcard as "Front: [question]" followed by "Back: [answer]" on the next line. Do not include any other text or formatting.Make sure there is exactly ${numCards} flashcards.\n\n${textToProcess}`,
             },
           ],
         },
@@ -208,9 +194,6 @@ const Dashboard = () => {
         }
       );
   
-      //console.log('Groq API Response:', response.data.choices[0].message.content);
-  
-      // Parse response to extract flashcards
       const generatedText = response.data.choices[0].message.content || '';
       const lines = generatedText.split('\n');
       let currentCard = { front: '', back: '' };
@@ -218,7 +201,7 @@ const Dashboard = () => {
       for (const line of lines) {
         if (line.startsWith('Front:')) {
           if (currentCard.front && currentCard.back) {
-            // Push the completed card before starting a new one
+            
             cards.push({ ...currentCard });
             currentCard = { front: '', back: '' };
           }
@@ -228,12 +211,12 @@ const Dashboard = () => {
         }
       }
   
-      // Add the last card if complete
+      
       if (currentCard.front && currentCard.back) {
         cards.push({ ...currentCard });
       }
       console.log('Generated Flashcards:', cards);
-      setFlashcards(cards); // Populate the state with flashcards
+      setFlashcards(cards); 
     } catch (error) {
       console.error('Error calling Groq API:', error);
       setFlashcards([
@@ -290,7 +273,7 @@ const Dashboard = () => {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter your prompt here..."
           ></textarea>
-          <div className="mb-2">
+          {/* <div className="mb-2">
             <label className="block text-sm font-medium text-gray-700">
               Or upload a PDF file
             </label>
@@ -300,7 +283,7 @@ const Dashboard = () => {
               onChange={handleFileChange}
               className="mt-1"
             />
-          </div>
+          </div> */}
           <div className="mb-2">
             <label className="block text-sm font-medium text-gray-700">
               Number of flashcards (max 20)
@@ -325,16 +308,16 @@ const Dashboard = () => {
           </button>
           <button
             type="button"
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 text-white px-4 py-2 pl-4 rounded hover:bg-green-700 ml-4"
             onClick={handleAddToDb}
             disabled={isLoading || flashcards.length === 0}
           >
-            {isLoading ? 'Processing...' : 'Add to Database'}
+            {isLoading ? 'Processing...' : 'Add to Study Sets'}
           </button>
         </form>
         {flashcards.length > 0 && (
           <div className="flashcard-container mt-6">
-            <h2 className="text-xl font-semibold mb-4">Generated Flashcards</h2>
+
             {flashcards.map((card, index) => (
               <Flashcard
                 key={index}

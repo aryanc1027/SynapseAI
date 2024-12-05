@@ -7,9 +7,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
-    email = Column(String, unique=True, index=True)  # Add email column
+    email = Column(String, unique=True, index=True)  
     hashed_password = Column(String)
     
-    # Add these relationships
+    
     study_sets = relationship("StudySet", back_populates="user")
     study_histories = relationship("StudyHistory", back_populates="user")
