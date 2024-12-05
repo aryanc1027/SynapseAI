@@ -16,10 +16,20 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Local Database Setup
 
-1) In your machine's terminal: brew install postgres
-2) To enter the SQL shell: psql -u postgres
-3) CREATE DATABASE qt_db;
-4) CREATE USER '{your username}'@'localhost' IDENTIFIED BY '{your password}';
+1) In your machine's terminal:
+ ```bash
+    brew install postgres
+ ```
+2) To enter the SQL shell:
+   ```bash
+   psql -u postgres
+   ```
+3) ```bash
+   CREATE DATABASE qt_db;
+   ```
+4) ```bash
+   CREATE USER '{your username}'@'localhost' IDENTIFIED BY '{your password}';
+   ```
 5) Fill out the backend environment file (see steps below)
 
 
@@ -42,10 +52,7 @@ POSTGRES_DATABASE=qt_db
     cd ..
     uvicorn backend.main:app --reload
     ```
-3. Create User 
-    ```
-
-4. Set up frontend
+3. Set up frontend
     ```bash 
     cd frontend
     npm install
