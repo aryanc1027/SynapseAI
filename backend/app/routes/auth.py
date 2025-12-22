@@ -1,18 +1,16 @@
 from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+
+from ..config import settings
 from ..database import get_db
 from ..models.user import User
-from ..utils.auth import create_access_token, get_password_hash
-from ..config import settings
 from ..schemas.user import UserCreate
-from passlib.context import CryptContext 
+from ..utils.auth import create_access_token, get_password_hash
 
-router = APIRouter(
-    prefix="/api/auth",
-    tags=["authentication"]
-)
+router = APIRouter(prefix="/api/auth", tags=["authentication"])
 
 SECRET_KEY = settings.SECRET_KEY
 
@@ -23,8 +21,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -38,18 +35,19 @@ async def get_current_user(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     user = db.query(User).filter(User.username == username).first()
     if user is None:
         raise credentials_exception
     return user
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
 @router.post("/token")
 async def login(
-    email: str = Form(...), 
-    password: str = Form(...),
-    db: Session = Depends(get_db)
+    email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)
 ):
     user = db.query(User).filter(User.email == email).first()
     if not user:
@@ -58,10 +56,8 @@ async def login(
     if not pwd_context.verify(password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
-
-    access_token = create_access_token(data={"sub": user.username}) 
+    access_token = create_access_token(data={"sub": user.username})
     return {"access_token": access_token, "token_type": "bearer"}
-
 
 
 @router.get("/me")
@@ -73,23 +69,27 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
         "email": current_user.email,
     }
 
+
 @router.post("/register")
 async def register_user(user: UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.query(User).filter(
-        (User.username == user.username) | (User.email == user.email)
-    ).first()
+    existing_user = (
+        db.query(User)
+        .filter((User.username == user.username) | (User.email == user.email))
+        .first()
+    )
     if existing_user:
         raise HTTPException(status_code=400, detail="Username or email already taken")
-    
+
     new_user = User(
         username=user.username,
         email=user.email,
-        hashed_password=get_password_hash(user.password)
+        hashed_password=get_password_hash(user.password),
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return {"message": "User registered successfully"}
+
 
 @router.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
@@ -98,8 +98,12 @@ async def logout(token: str = Depends(oauth2_scheme)):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+            )
+
         return {"message": "Successfully logged out"}
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+        )
