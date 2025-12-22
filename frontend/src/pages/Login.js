@@ -43,7 +43,7 @@ const Login = () => {
      
       localStorage.setItem('authToken', access_token);
   
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setError(err.message || 'Something went wrong. Please try again.');
     }

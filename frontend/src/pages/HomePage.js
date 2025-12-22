@@ -26,12 +26,9 @@ const HomePage = () => {
       <nav className="w-full px-6 py-6 flex justify-between items-center relative z-10">
         <h1 className="text-3xl font-bold text-[#00fff5]">SynapseAI</h1>
         {userIsLoggedIn ? (
-          <Link 
-            to="/dashboard"
-            className="bg-[#4a5d7e] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#00fff5] hover:text-[#0a1a2a] transition duration-300"
-          >
-            Dashboard
-          </Link>
+          <div className="text-[#00fff5]">
+            Welcome back!
+          </div>
         ) : (
           <div className="flex space-x-4">
             <Link 
@@ -59,38 +56,38 @@ const HomePage = () => {
         >
           <h2 className="text-7xl font-extrabold mb-6 leading-tight">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#4a5d7e] to-[#00fff5]">
-              AI-Powered Learning
+              Location-Based Dating
             </span>
             <br />
-            <span className="text-white">for the Digital Age</span>
+            <span className="text-white">Heatmap</span>
           </h2>
           <p className="text-xl mb-10 max-w-2xl mx-auto text-[#00fff5]">
-            Revolutionize your study habits with SynapseAI's cutting-edge AI technology.
+            Discover the hottest places in town for dating and socializing.
           </p>
           <Link 
-            to={userIsLoggedIn ? "/dashboard" : "/register"}
+            to={userIsLoggedIn ? "/" : "/register"}
             className="bg-gradient-to-r from-[#1a2a3a] to-[#4a5d7e] text-white px-10 py-4 rounded-full font-bold text-lg hover:from-[#4a5d7e] hover:to-[#00fff5] hover:text-[#0a1a2a] transition duration-300 shadow-lg inline-flex items-center"
           >
-            <span>{userIsLoggedIn ? "Continue Learning" : "Start Learning Now"}</span>
+            <span>{userIsLoggedIn ? "Get Started" : "Get Started"}</span>
             <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
           </Link>
         </motion.div>
         
         <div className="grid md:grid-cols-3 gap-8 mb-20">
           <FeatureCard 
-            title="AI-Powered Flashcards" 
-            description="Generate intelligent flashcards that evolve with your knowledge."
-            icon={<FaBrain className="w-12 h-12" />}
-          />
-          <FeatureCard 
-            title="Real-Time Insights" 
-            description="Track key performance metrics like response times and outcomes with actionable analytics to optimize your learning journey."
+            title="Real-Time Heatmap" 
+            description="See where the action is happening in real-time across your city."
             icon={<FaRoute className="w-12 h-12" />}
           />
           <FeatureCard 
-            title="Progress Tracking" 
-            description="Visualize your learning journey with detailed analytics."
+            title="Location Tracking" 
+            description="Track popular dating spots and social hotspots."
             icon={<FaChartLine className="w-12 h-12" />}
+          />
+          <FeatureCard 
+            title="Discover Hotspots" 
+            description="Find the best places for dating and socializing near you."
+            icon={<FaBrain className="w-12 h-12" />}
           />
         </div>
         
@@ -102,7 +99,7 @@ const HomePage = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="bg-gradient-to-br from-[#1a2a3a] to-[#4a5d7e] p-12 rounded-3xl shadow-2xl"
             >
-              <h2 className="text-4xl font-bold mb-6 text-center text-white">Ready to transform your learning experience?</h2>
+              <h2 className="text-4xl font-bold mb-6 text-center text-white">Ready to discover the hottest spots in town?</h2>
               <div className="flex justify-center">
                 <Link 
                   to="/register" 

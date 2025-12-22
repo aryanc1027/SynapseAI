@@ -1,13 +1,6 @@
 import api from './index';
 
 export const userService = {
-  updateProfile: async (userData) => {
-    const response = await api.put('/users/profile', userData);
-    return response.data;
-  },
-
-  getProfile: async () => {
-    const response = await api.get('/users/profile');
-    return response.data;
-  }
+  // User service endpoints - add as needed when implementing user profile features
+  // Currently, user profile endpoints are not implemented in the backend
 };

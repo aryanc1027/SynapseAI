@@ -1,6 +1,48 @@
+# Claude Code settings
+.claude
+
+# Environment files
 backend/.env
 frontend/.env
+.env.local
+.env.*.local
+
+# Python cache
 backend/__pycache__
 backend/app/routes/__pycache__
 backend/app/__pycache__
 backend/app/schemas/__pycache__
+*.py[cod]
+*$py.class
+*.so
+
+# Poetry
+backend/.venv
+backend/dist
+backend/*.egg-info
+
+# Node
+frontend/node_modules
+frontend/build
+frontend/dist
+frontend/.npm
+frontend/.eslintcache
+
+# Docker
+.dockerignore
+*.log
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,26 +1,20 @@
 from fastapi import APIRouter, Depends, Form, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from datetime import datetime, timedelta
-from typing import Optional
+from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models.user import User
-from ..utils.auth import verify_password, create_access_token
-import os
-from sqlalchemy.orm import Session
-from backend.app.schemas.user import UserCreate
-from backend.app.utils.auth import get_password_hash
-from passlib.context import CryptContext
-import time 
+from ..utils.auth import create_access_token, get_password_hash
+from ..config import settings
+from ..schemas.user import UserCreate
+from passlib.context import CryptContext 
 
 router = APIRouter(
     prefix="/api/auth",
     tags=["authentication"]
 )
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise ValueError("No SECRET_KEY set in environment variables")
+SECRET_KEY = settings.SECRET_KEY
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -99,17 +93,12 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 async def logout(token: str = Depends(oauth2_scheme)):
+    """Logout endpoint - token invalidation handled client-side"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-        
-        expiration = payload.get("exp", time.time() + 300)  
-        blacklisted_tokens[token] = expiration
-        
-        current_time = time.time()
-        blacklisted_tokens = {t: exp for t, exp in blacklisted_tokens.items() if exp > current_time}
         
         return {"message": "Successfully logged out"}
     except JWTError:

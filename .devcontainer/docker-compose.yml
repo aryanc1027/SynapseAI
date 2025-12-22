@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: synapseai-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ..:/workspace:cached
+      - ../backend:/app:cached
+      - backend-poetry-cache:/root/.cache/pypoetry
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=${DATABASE_URL:-postgresql://user:password@localhost:5432/synapseai}
+    networks:
+      - synapseai-network
+    restart: unless-stopped
+    command: poetry run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: synapseai-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../frontend:/app:cached
+      - frontend-node-modules:/app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    networks:
+      - synapseai-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+
+networks:
+  synapseai-network:
+    driver: bridge
+
+volumes:
+  backend-poetry-cache:
+    driver: local
+  frontend-node-modules:
+    driver: local
